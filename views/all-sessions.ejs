@@ -1,0 +1,116 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>All Sessions</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <header class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">All Sessions</h1>
+      <p class="text-lg">Welcome, <%= user.name %></p>
+      <a href="/logout" class="text-lg hover:text-gray-300">Logout</a>
+    </div>
+  </header>
+  <div class="container mx-auto mt-8 px-4">
+    <section class="dashboard-container p-6 bg-white mb-6">
+      <h2 class="text-2xl font-semibold mb-4">Create Session</h2>
+      <form action="/create-session" method="POST" class="mb-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="sport_id" class="block mb-2">Sport:</label>
+            <select name="sport_id" id="sport_id"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <% sports.forEach(sport => { %>
+              <option value="<%= sport.id %>"><%= sport.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label for="team1" class="block mb-2">Team 1:</label>
+            <input type="text" name="team1" id="team1"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+          </div>
+          <div>
+            <label for="team2" class="block mb-2">Team 2:</label>
+            <input type="text" name="team2" id="team2"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+          </div>
+          <div>
+            <label for="date" class="block mb-2">Date:</label>
+            <input type="date" name="date" id="date"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+          </div>
+          <div>
+            <label for="venue" class="block mb-2">Venue:</label>
+            <input type="text" name="venue" id="venue"
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+          </div>
+        </div>
+        <button type="submit"
+          class="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">Create
+          Session</button>
+      </form>
+    </section>
+
+    <section class="dashboard-container p-6 bg-white">
+      <h2 class="text-2xl font-semibold mb-4">All Sessions</h2>
+      <ul>
+        <% sessions.forEach(session => { %>
+        <li class="border-b border-gray-200 py-2">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-semibold"><%= session.sport_name %></h3>
+              <p class="text-sm text-gray-600">Teams: <%= session.team1 %> vs <%= session.team2 %></p>
+              <p class="text-sm text-gray-600">Date: <%= session.date %></p>
+              <p class="text-sm text-gray-600">Venue: <%= session.venue %></p>
+              <p class="text-sm text-gray-600">Created by: <%= session.creator_name %></p>
+            </div>
+            <div class="flex items-center">
+              <button onclick="toggleEditForm('<%= session.id %>')"
+                class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">Edit</button>
+              <form action="/delete-session/<%= session.id %>" method="POST" class="ml-2">
+                <button type="submit"
+                  class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Delete</button>
+              </form>
+            </div>
+          </div>
+          <form id="edit-form-<%= session.id %>" class="edit-session-form mt-4 hidden"
+            action="/edit-session/<%= session.id %>" method="POST">
+            <label for="team1" class="block mb-2">Team 1:</label>
+            <input type="text" name="team1" id="team1" value="<%= session.team1 %>" required
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label for="team2" class="block mb-2">Team 2:</label>
+            <input type="text" name="team2" id="team2" value="<%= session.team2 %>" required
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label for="date" class="block mb-2">Date:</label>
+            <input type="date" name="date" id="date" value="<%= session.date %>" required
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label for="venue" class="block mb-2">Venue:</label>
+            <input type="text" name="venue" id="venue" value="<%= session.venue %>" required
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="submit"
+              class="w-full mt-2 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">Save
+              Changes</button>
+          </form>
+        </li>
+        <% }) %>
+      </ul>
+    </section>
+  </div>
+  <script>
+    function toggleEditForm(sessionId) {
+      const form = document.getElementById(`edit-form-${sessionId}`);
+      form.classList.toggle('hidden');
+    }
+  </script>
+</body>
+
+</html>

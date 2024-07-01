@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reports</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body id="reports-page" class="bg-gray-100">
+  <header class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4">
+      <h1 class="text-2xl font-bold">Reports</h1>
+    </div>
+  </header>
+
+  <div class="container mx-auto mt-8 px-4">
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Session Details</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border-gray-200 shadow-lg rounded-lg">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="text-left py-2 px-4">Sport</th>
+              <th class="text-left py-2 px-4">Teams</th>
+              <th class="text-left py-2 px-4">Date</th>
+              <th class="text-left py-2 px-4">Venue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sessions.forEach(session => { %>
+              <tr>
+                <td class="py-2 px-4 border-b border-gray-200"><%= session.sport_name %></td>
+                <td class="py-2 px-4 border-b border-gray-200"><%= session.team1 %> vs <%= session.team2 %></td>
+                <td class="py-2 px-4 border-b border-gray-200"><%= session.date %></td>
+                <td class="py-2 px-4 border-b border-gray-200"><%= session.venue %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4">Sport Popularity</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border-gray-200 shadow-lg rounded-lg">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="text-left py-2 px-4">Sport</th>
+              <th class="text-left py-2 px-4">Number of Sessions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% popularity.forEach(sport => { %>
+              <tr>
+                <td class="py-2 px-4 border-b border-gray-200"><%= sport.name %></td>
+                <td class="py-2 px-4 border-b border-gray-200"><%= sport.count %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>

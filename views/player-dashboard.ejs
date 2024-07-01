@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Player Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    .joined-btn {
+      background-color: #4CAF50; 
+      color: white;
+    }
+    .header-bg {
+      background: linear-gradient(90deg, #4a5568, #2d3748); 
+      padding-top: 2rem;
+      padding-bottom: 2rem; 
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <header class="header-bg text-white">
+    <div class="container mx-auto px-4 flex items-center">
+      <h1 class="text-4xl font-bold flex-shrink-0">Player Dashboard</h1>
+      <div class="flex-grow text-center">
+        <p class="text-3xl">Welcome, <%= user.name %></p>
+      </div>
+      <nav class="flex space-x-4 pr-4">
+        <a href="#home" class="text-2xl hover:text-gray-300">Home</a>
+        <a href="#sportsSection" class="text-2xl hover:text-gray-300">Sports</a>
+        <a href="#sessionsCreatedSection" class="text-2xl hover:text-gray-300">Sessions</a>
+        <a href="/logout" class="text-2xl hover:text-gray-300">Logout</a>
+      </nav>
+    </div>
+  </header>
+  <div class="container mx-auto mt-8 px-4">
+    <div id="sportsSection">
+      <h2 class="text-2xl font-semibold mb-4">Sports</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <% sports.forEach(sport => { %>
+          <div class="bg-white shadow-lg rounded-lg p-6 transition duration-200 hover:shadow-2xl hover:transform hover:scale-110"> 
+            <h3 class="text-xl font-semibold mb-4"><%= sport.name %></h3>
+            <button id="toggleFormButton<%= sport.id %>" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200">Create Session</button>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    <section id="createSessionsSection" class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4">Create Sessions</h2>
+      <% sports.forEach(sport => { %>
+        <div id="createSessionSection<%= sport.id %>" class="create-session-section hidden bg-white shadow-lg rounded-lg p-6 mb-4">
+          <h3 class="text-xl font-semibold mb-4">Create Session for <%= sport.name %></h3>
+          <form id="createSessionForm<%= sport.id %>" action="/create-session" method="POST">
+            <input type="hidden" name="sport_id" value="<%= sport.id %>">
+
+            <div class="mb-4">
+              <label for="team1_players_<%= sport.id %>" class="block mb-1">Team 1 Players:</label>
+              <div id="team1_players_<%= sport.id %>">
+                <input type="text" name="team1_players[]" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" placeholder="Enter player name" required>
+              </div>
+              <button type="button" onclick="addPlayerInput('team1_players_<%= sport.id %>')" class="bg-gray-300 hover:bg-gray-400 text-black py-1 px-2 rounded-lg mb-2">Add Player</button>
+            </div>
+
+            <div class="mb-4">
+              <label for="team1_extra_<%= sport.id %>" class="block mb-1">Additional Players Needed for Team 1:</label>
+              <input type="number" name="team1_extra" id="team1_extra_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="0" required>
+            </div>
+
+            <div class="mb-4">
+              <label for="team2_players_<%= sport.id %>" class="block mb-1">Team 2 Players:</label>
+              <div id="team2_players_<%= sport.id %>">
+                <input type="text" name="team2_players[]" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" placeholder="Enter player name" required>
+              </div>
+              <button type="button" onclick="addPlayerInput('team2_players_<%= sport.id %>')" class="bg-gray-300 hover:bg-gray-400 text-black py-1 px-2 rounded-lg mb-2">Add Player</button>
+            </div>
+
+            <div class="mb-4">
+              <label for="team2_extra_<%= sport.id %>" class="block mb-1">Additional Players Needed for Team 2:</label>
+              <input type="number" name="team2_extra" id="team2_extra_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="0" required>
+            </div>
+
+            <div class="mb-4">
+              <label for="date_<%= sport.id %>" class="block mb-1">Date:</label>
+              <input type="date" name="date" id="date_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div class="mb-4">
+              <label for="time_<%= sport.id %>" class="block mb-1">Time:</label>
+              <input type="time" name="time" id="time_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div class="mb-4">
+              <label for="venue_<%= sport.id %>" class="block mb-1">Venue:</label>
+              <input type="text" name="venue" id="venue_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200">Create Session</button>
+          </form>
+        </div>
+      <% }) %>
+    </section>
+    <section id="sessionsCreatedSection" class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4">Sessions Created by You</h2>
+      <% sessions.forEach(session => { %>
+        <% if (session.creator_id === user.id) { %> 
+          <div class="bg-white shadow-lg rounded-lg p-6 mb-4">
+            <h3 class="text-xl font-semibold mb-4"><%= session.sport_name %></h3>
+            <p><strong>Teams:</strong> <%= session.team1 %> vs <%= session.team2 %></p>
+            <p><strong>Date:</strong> <%= session.date %></p>
+            <p><strong>Venue:</strong> <%= session.venue %></p>
+
+            <a href="#" class="mr-4 text-blue-500 hover:text-blue-600" onclick="editSession('<%= session.id %>', '<%= session.team1 %>', '<%= session.team2 %>', '<%= session.date %>', '<%= session.venue %>')">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9a6 6 0 00-6-6M3 15a6 6 0 0110-4.899m0 0A6 6 0 1015 3m-7 10h4" />
+              </svg>
+            </a>
+            <form action="/delete-session/<%= session.id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this session?');">
+              <button type="submit" class="text-red-500 hover:text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </form>
+          </div>
+        <% } %>
+      <% }) %>
+    </section>
+<section id="existingSessionsSection" class="mt-8">
+  <h2 class="text-2xl font-semibold mb-4">Existing Sessions</h2>
+  <% sessions.forEach(session => { %>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-4" id="session<%= session.id %>">
+      <h3 class="text-xl font-semibold mb-4"><%= session.sport_name %></h3>
+      <p><strong>Teams:</strong> <%= session.team1 %> vs <%= session.team2 %></p>
+      <p><strong>Date:</strong> <%= session.date %></p>
+      <p><strong>Venue:</strong> <%= session.venue %></p>
+      <% if (session.creator_id !== user.id) { %>
+        <form id="joinSessionForm<%= session.id %>" class="joinSessionForm" data-session-id="<%= session.id %>">
+          <input type="hidden" name="session_id" value="<%= session.id %>">
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200 mt-4">Join Session</button>
+        </form>
+      <% } %>
+      <div class="mt-4">
+        <h4 class="text-lg font-semibold mb-2">Players:</h4>
+        <ul id="sessionPlayers<%= session.id %>">
+          <% if (session.players && session.players.length > 0) { %>
+            <% session.players.forEach(player => { %>
+              <li><%= player.name %></li>
+            <% }) %>
+          <% } else { %>
+            <li>No players joined yet.</li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+  <% }) %>
+</section>
+
+  </div>
+  <div id="editSessionModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 class="text-2xl font-semibold mb-4">Edit Session</h2>
+      <form id="editSessionForm" action="/edit-session" method="POST">
+        <input type="hidden" id="editSessionId" name="session_id" value="">
+        <div class="mb-4">
+          <label for="editTeam1" class="block mb-1">Team 1:</label>
+          <input type="text" id="editTeam1" name="team1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="editTeam2" class="block mb-1">Team 2:</label>
+          <input type="text" id="editTeam2" name="team2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="editDate" class="block mb-1">Date:</label>
+          <input type="date" id="editDate" name="date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="editVenue" class="block mb-1">Venue:</label>
+          <input type="text" id="editVenue" name="venue" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200">Save Changes</button>
+        <button type="button" onclick="closeEditModal()" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg ml-4">Cancel</button>
+      </form>
+    </div>
+    
+  </div>
+
+  <script>
+    function editSession(sessionId, team1, team2, date, venue) {
+      document.getElementById('editSessionId').value = sessionId;
+      document.getElementById('editTeam1').value = team1;
+      document.getElementById('editTeam2').value = team2;
+      document.getElementById('editDate').value = date;
+      document.getElementById('editVenue').value = venue;
+
+      document.getElementById('editSessionModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editSessionModal').classList.add('hidden');
+    }
+
+    function addPlayerInput(teamId) {
+      const teamDiv = document.getElementById(teamId);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = teamId.includes('team1') ? 'team1_players[]' : 'team2_players[]';
+      input.className = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2';
+      input.placeholder = 'Enter player name';
+      input.required = true;
+      teamDiv.appendChild(input);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.joinSessionForm').forEach(form => {
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const sessionId = form.dataset.sessionId;
+
+      try {
+        const response = await fetch('/join-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            session_id: sessionId
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const session = data.session;
+
+          const button = form.querySelector('button[type="submit"]');
+          button.textContent = 'Joined Session';
+          button.classList.add('joined-btn');
+          button.disabled = true;
+
+          const playersList = document.getElementById(`sessionPlayers${sessionId}`);
+          playersList.innerHTML = '';
+          session.players.forEach(player => {
+            const li = document.createElement('li');
+            li.textContent = player;
+            playersList.appendChild(li);
+          });
+
+        } else {
+          console.error('Failed to join session');
+        }
+      } catch (error) {
+        console.error('Error joining session:', error);
+      }
+    });
+  });
+      <% sports.forEach(sport => { %>
+        const toggleButton<%= sport.id %> = document.getElementById('toggleFormButton<%= sport.id %>');
+        const formSection<%= sport.id %> = document.getElementById('createSessionSection<%= sport.id %>');
+
+        toggleButton<%= sport.id %>.addEventListener('click', function () {
+          document.querySelectorAll('[id^="createSessionSection"]').forEach(section => {
+            if (section.id !== `createSessionSection<%= sport.id %>`) {
+              section.classList.add('hidden');
+            }
+          });
+          formSection<%= sport.id %>.classList.toggle('hidden');
+        });
+
+        const form<%= sport.id %> = document.getElementById('createSessionForm<%= sport.id %>');
+        form<%= sport.id %>.addEventListener('submit', async function (event) {
+          event.preventDefault();
+          const button = form<%= sport.id %>.querySelector('button[type="submit"]');
+          const sportId = form<%= sport.id %>.querySelector('input[name="sport_id"]').value;
+          const team1Players = Array.from(form<%= sport.id %>.querySelectorAll('input[name="team1_players[]"]')).map(input => input.value);
+          const team2Players = Array.from(form<%= sport.id %>.querySelectorAll('input[name="team2_players[]"]')).map(input => input.value);
+          const team1_extra = form<%= sport.id %>.querySelector('#team1_extra_' + sportId).value;
+          const team2_extra = form<%= sport.id %>.querySelector('#team2_extra_' + sportId).value;
+          const date = form<%= sport.id %>.querySelector('#date_' + sportId).value;
+          const time = form<%= sport.id %>.querySelector('#time_' + sportId).value;
+          const venue = form<%= sport.id %>.querySelector('#venue_' + sportId).value;
+
+          try {
+            const response = await fetch('/create-session', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                sport_id: sportId,
+                team1_players: team1Players,
+                team2_players: team2Players,
+                team1_extra: team1_extra,
+                team2_extra: team2_extra,
+                date: date,
+                time: time,
+                venue: venue
+              })
+            });
+
+            if (response.ok) {
+              console.log('Session created successfully');
+              button.textContent = 'Session Created';
+              button.classList.add('bg-green-500');
+              button.classList.remove('bg-blue-500');
+              button.disabled = true;
+              formSection<%= sport.id %>.classList.add('hidden');
+
+              const sessionsCreatedSection = document.getElementById('sessionsCreatedSection');
+              const newSession = {
+                sport_name: "<%= sport.name %>",
+                team1_players: team1Players,
+                team2_players: team2Players,
+                team1_extra: team1_extra,
+                team2_extra: team2_extra,
+                date: date,
+                time: time,
+                venue: venue
+              };
+              const sessionTemplate = `
+                <div class="bg-white shadow-lg rounded-lg p-6 mb-4">
+                  <h3 class="text-xl font-semibold mb-4">${newSession.sport_name}</h3>
+                  <p><strong>Team 1 Players:</strong> ${newSession.team1_players.join(', ')}</p>
+                  <p><strong>Additional Players Needed for Team 1:</strong> ${newSession.team1_extra}</p>
+                  <p><strong>Team 2 Players:</strong> ${newSession.team2_players.join(', ')}</p>
+                  <p><strong>Additional Players Needed for Team 2:</strong> ${newSession.team2_extra}</p>
+                  <p><strong>Date:</strong> ${newSession.date}</p>
+                  <p><strong>Time:</strong> ${newSession.time}</p>
+                  <p><strong>Venue:</strong> ${newSession.venue}</p>
+                </div>
+              `;
+              sessionsCreatedSection.insertAdjacentHTML('beforeend', sessionTemplate);
+            } else {
+              console.error('Failed to create session');
+            }
+          } catch (error) {
+            console.error('Error creating session:', error);
+          }
+        });
+      <% }) %>
+      <% sessions.forEach(session => { %>
+    const joinForm<%= session.id %> = document.getElementById('joinSessionForm<%= session.id %>');
+    joinForm<%= session.id %>.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const sessionId = joinForm<%= session.id %>.querySelector('input[name="session_id"]').value;
+
+      try {
+        const response = await fetch('/join-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            session_id: sessionId
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Player joined session:', data.session);
+        } else {
+          console.error('Failed to join session');
+        }
+      } catch (error) {
+        console.error('Error joining session:', error);
+      }
+    });
+  <% }) %>
+
+    });
+  </script>
+</body>
+</html>

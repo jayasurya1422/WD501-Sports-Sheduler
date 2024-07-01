@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    .sport-card {
+      width: 250px;
+      height: 250px;
+    }
+    .header-bg {
+      background: linear-gradient(90deg, #4a5568, #2d3748); 
+      padding-top: 2rem; 
+      padding-bottom: 2rem; 
+    }
+    .section-bg {
+      background: url('https://www.toptal.com/designers/subtlepatterns/patterns/memphis-mini.png'); 
+      background-size: cover;
+    }
+    .section-header {
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); 
+      padding: 1rem;
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .section-body {
+      padding: 1.5rem;
+      border-radius: 0 0 0.5rem 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <header class="header-bg text-white">
+    <div class="container mx-auto px-4 flex items-center">
+      <h1 class="text-4xl font-bold flex-shrink-0">Admin Dashboard</h1>
+      <div class="flex-grow text-center">
+        <p class="text-3xl">Welcome, <%= user.name %></p>
+      </div>
+      <nav class="flex space-x-4 pr-4">
+        <a href="#home" class="text-2xl hover:text-gray-300">Home</a>
+        <a href="#sports" class="text-2xl hover:text-gray-300">Sports</a>
+        <a href="#sessions" class="text-2xl hover:text-gray-300">Sessions</a>
+        <a href="/logout" class="text-2xl hover:text-gray-300">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="home" class="container mx-auto mt-8 px-4">
+  </div>
+
+  <div id="sports" class="container mx-auto mt-8 px-4">
+    <section class="section-bg shadow-lg rounded-lg mb-6">
+      <div class="section-header">
+        <h2 class="text-2xl font-semibold">Sports</h2>
+      </div>
+      <div class="section-body bg-white">
+        <div class="mb-4 flex justify-between items-center">
+          <button id="toggleCreateSportForm" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 mr-2" onclick="toggleCreateSportForm()">Create Sport</button>
+          <button id="cancelCreateSport" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200 hidden">Cancel</button>
+        </div>
+
+        <form action="/create-sport" method="POST" id="createSportForm" class="mb-4 hidden">
+          <div class="mb-4">
+            <input type="text" name="name" id="sport_name" class="w-96 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add Sport..." required />
+          </div>
+          <div>
+            <button type="submit" class="w-32 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">Add Sport</button>
+          </div>
+        </form>
+        <div id="sportsList" class="grid grid-cols-5 gap-4">
+          <% sports.forEach(sport => { %>
+            <div class="bg-gray-200 shadow-lg rounded-lg p-4 mb-6 sport-card relative" data-sport-id="<%= sport.id %>">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="text-xl font-semibold"><%= sport.name %></h3>
+                <button onclick="deleteSport('<%= sport.id %>')" class="text-red-500 hover:text-red-700 focus:outline-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div class="absolute bottom-4 left-4 right-4">
+                <button onclick="toggleCreateSessionForm('<%= sport.id %>', '<%= sport.name %>')" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 w-full">Create Session</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="sessions" class="container mx-auto mt-8 px-4">
+    <section id="createSessionSection" class="section-bg shadow-lg rounded-lg mb-6">
+      <div class="section-header">
+        <h2 id="createSessionHeader" class="text-2xl font-semibold">Create Session</h2>
+      </div>
+      <div class="section-body bg-white">
+        <% sports.forEach(sport => { %>
+          <div id="createSessionForm<%= sport.id %>" class="createSessionForm hidden mt-4 bg-white shadow-lg rounded-lg p-4">
+            <form action="/create-session" method="POST">
+              <input type="hidden" name="sport_id" value="<%= sport.id %>">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="team1_<%= sport.id %>" class="block mb-2">Team 1:</label>
+                  <input type="text" name="team1" id="team1_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                <div>
+                  <label for="team2_<%= sport.id %>" class="block mb-2">Team 2:</label>
+                  <input type="text" name="team2" id="team2_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                <div>
+                  <label for="date_<%= sport.id %>" class="block mb-2">Date:</label>
+                  <input type="date" name="date" id="date_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                <div>
+                  <label for="venue_<%= sport.id %>" class="block mb-2">Venue:</label>
+                  <input type="text" name="venue" id="venue_<%= sport.id %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+              </div>
+              <div class="flex justify-end mt-4">
+                <button type="button" onclick="toggleCreateSessionForm('<%= sport.id %>', '<%= sport.name %>')" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200 mr-2">Cancel</button>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">Create Session</button>
+              </div>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+<section id="allSessions" class="section-bg shadow-lg rounded-lg mb-6">
+  <div class="section-header">
+    <h2 class="text-2xl font-semibold">All Sessions</h2>
+  </div>
+  <div class="section-body bg-white">
+    <ul>
+      <% sessions.forEach(session => { %>
+        <li class="border-b border-gray-200 py-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-semibold"><%= session.sport_name %></h3>
+              <p class="text-sm text-gray-600">Teams: <%= session.team1 %> vs <%= session.team2 %></p>
+              <p class="text-sm text-gray-600">Date: <%= session.date %></p>
+              <p class="text-sm text-gray-600">Venue: <%= session.venue %></p>
+              <p class="text-sm text-gray-600">Created by: <%= session.creator_name %></p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <% if (user.role === 'admin') { %>
+              <button onclick="toggleEditForm('<%= session.id %>')" class="text-blue-500 hover:text-blue-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+              <button onclick="deleteSession('<%= session.id %>')" class="text-red-500 hover:text-red-700 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <% } %>
+            </div>
+          </div>
+          <form id="edit-form-<%= session.id %>" class="hidden mt-4" action="/edit-session" method="POST">
+            <input type="hidden" name="session_id" value="<%= session.id %>">
+            <input type="text" name="team1" value="<%= session.team1 %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="text" name="team2" value="<%= session.team2 %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="date" name="date" value="<%= session.date %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <input type="text" name="venue" value="<%= session.venue %>" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+            <div class="flex justify-end mt-4">
+              <button type="button" onclick="toggleEditForm('<%= session.id %>')" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200 mr-2">Cancel</button>
+              <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">Save Changes</button>
+            </div>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+</section>
+</div>
+
+  <script>
+function toggleCreateSessionForm(sportId, sportName) {
+  document.querySelectorAll('.createSessionForm').forEach(form => {
+    if (form.id !== `createSessionForm${sportId}`) {
+      form.classList.add('hidden');
+    }
+  });
+
+  const form = document.getElementById(`createSessionForm${sportId}`);
+  form.classList.toggle('hidden');
+
+  const sessionHeader = document.getElementById('createSessionHeader');
+  sessionHeader.textContent = `Create Session for ${sportName}`;
+}
+
+function toggleEditForm(sessionId) {
+    const editForm = document.getElementById(`edit-form-${sessionId}`);
+    if (editForm.classList.contains('hidden')) {
+      editForm.classList.remove('hidden');
+    } else {
+      editForm.classList.add('hidden');
+    }
+  }
+function submitEditSessionForm(sessionId) {
+  const form = document.getElementById(`edit-form-${sessionId}`);
+  const formData = new FormData(form);
+
+  fetch(`/edit-session/${sessionId}`, {
+    method: 'POST',
+    body: new URLSearchParams(formData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to update session');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Session updated successfully:', data);
+    toggleEditForm(sessionId);
+    window.location.reload();  // Optionally reload the page to reflect changes
+  })
+  .catch(error => {
+    console.error('Error updating session:', error);
+  });
+}
+
+function deleteSport(sportId) {
+  if (confirm("Are you sure you want to delete this sport?")) {
+    fetch(`/delete-sport/${sportId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to delete sport');
+      }
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error deleting sport:', error);
+    });
+  }
+}
+
+function deleteSession(sessionId) {
+  if (confirm("Are you sure you want to delete this session?")) {
+    fetch(`/delete-session/${sessionId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to delete session');
+      }
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error deleting session:', error);
+    });
+  }
+}
+
+function toggleCreateSportForm() {
+  const createSportForm = document.getElementById('createSportForm');
+  const toggleCreateSportBtn = document.getElementById('toggleCreateSportForm');
+  const cancelCreateSportBtn = document.getElementById('cancelCreateSport');
+
+  createSportForm.classList.toggle('hidden');
+  toggleCreateSportBtn.classList.toggle('hidden');
+  cancelCreateSportBtn.classList.toggle('hidden');
+}
+
+  </script>
+</body>
+</html>
